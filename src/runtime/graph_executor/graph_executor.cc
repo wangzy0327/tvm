@@ -425,6 +425,7 @@ void GraphExecutor::SetupStorage() {
     }
   }
 
+  VLOG(0)<<"pool entry size : "<<pool_entry.size()<<std::endl;
   // Allocate the space.
   for (const auto& pit : pool_entry) {
     // This for loop is very fast since there are usually only a couple of

@@ -518,7 +518,7 @@ class IntervalSetEvaluator : public ExprFunctor<IntervalSet(const PrimExpr&)> {
   }
 
   IntervalSet VisitExprDefault_(const Object* op) final {
-    DLOG(WARNING) << "cannot evaluate set type " << op->GetTypeKey();
+    // DLOG(WARNING) << "cannot evaluate set type " << op->GetTypeKey();
     return IntervalSet::Everything();
   }
 

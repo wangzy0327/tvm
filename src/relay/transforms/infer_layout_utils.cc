@@ -42,9 +42,9 @@ Layout AdjustSubordinateFactors(const Layout& src_layout, const Layout& old_layo
   //   2) Find the Index of this dual axis in old_layout.
   //   3) Find the shape of the that axis in old_shape.
   //   4) a) Adjust factor to 1, if that shape is 1. b) Else retain the factor.
-  DLOG(INFO) << "AdjustSubordinateFactors"
-             << "src_layout: " << src_layout << " old_layout: " << old_layout
-             << " old_shape: " << old_shape << std::endl;
+  // DLOG(INFO) << "AdjustSubordinateFactors"
+  //            << "src_layout: " << src_layout << " old_layout: " << old_layout
+  //            << " old_shape: " << old_shape << std::endl;
   std::string new_layout;
   for (auto axis : src_layout->axes) {
     if (!LayoutAxis::Get(axis).IsPrimal()) {
@@ -85,8 +85,8 @@ Layout AdjustSubordinateFactors(const Layout& src_layout, const Layout& old_layo
 }
 
 bool Isomorphic(const Layout& lhs, const Layout& rhs) {
-  DLOG(INFO) << "Isomorphic: "
-             << "lhs: " << lhs << " rhs: " << rhs << std::endl;
+  // DLOG(INFO) << "Isomorphic: "
+  //            << "lhs: " << lhs << " rhs: " << rhs << std::endl;
   ICHECK(lhs.defined());
   ICHECK(rhs.defined());
   if (lhs->axes.size() != rhs->axes.size()) return false;
@@ -115,8 +115,8 @@ bool Isomorphic(const Layout& lhs, const Layout& rhs) {
 }
 
 Layout TryTransformLike(const Layout& old, const Layout& ref_old, const Layout& ref_new) {
-  DLOG(INFO) << "transform_layout: old = " << old << ", ref_new = " << ref_new
-             << ", ref_old = " << ref_old << std::endl;
+  // DLOG(INFO) << "transform_layout: old = " << old << ", ref_new = " << ref_new
+  //            << ", ref_old = " << ref_old << std::endl;
   ICHECK(ref_old.defined());
   ICHECK(ref_new.defined());
   ICHECK(old.defined());
@@ -181,7 +181,7 @@ Layout TryTransformLike(const Layout& old, const Layout& ref_old, const Layout& 
     }
   }
 
-  DLOG(INFO) << "new_layout = " << new_layout << std::endl;
+  // DLOG(INFO) << "new_layout = " << new_layout << std::endl;
   return Layout(new_layout);
 }
 

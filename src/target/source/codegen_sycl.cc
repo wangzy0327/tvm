@@ -169,10 +169,6 @@ void CodeGenSYCL::PrintType(DataType t, std::ostream& os) {  // NOLINT(*)
     os << "void";
     return;
   }
-  if (t == DataType::Bool()) {
-    os << "bool";
-    return;
-  }
   bool fail = false;
   if (t.is_float()) {
     switch (t.bits()) {
@@ -228,6 +224,17 @@ void CodeGenSYCL::PrintType(DataType t, std::ostream& os) {  // NOLINT(*)
     if (!fail && lanes == 1) return;
     if (!fail && ((lanes >= 2 && lanes <= 4) || lanes == 8 || lanes == 16)) {
       os << lanes;
+      return;
+    }
+  }else if (t == DataType::Bool()) {
+    os << "bool";
+    return;
+  }else if (t.is_vector_bool()) {
+    // SYCL does not support bool vectors.
+    // Use ushort vectors to represent instead.
+    int n = t.lanes();
+    if (n <= 4) {
+      os << "ushort" << n;
       return;
     }
   }

@@ -404,11 +404,11 @@ Expr LayoutRewriter(const Call& ref_call, const Array<Expr>& new_args, const Obj
     return arg_item;
   };
 
-  DLOG(INFO) << "Transforming layout for `" << ref_call->op << "`";
-  DLOG(INFO) << " old_prd=" << old_prd;
-  DLOG(INFO) << " new_prd=" << new_prd;
-  DLOG(INFO) << " old_cur=" << old_cur;
-  DLOG(INFO) << " new_cur=" << new_cur;
+  // DLOG(INFO) << "Transforming layout for `" << ref_call->op << "`";
+  // DLOG(INFO) << " old_prd=" << old_prd;
+  // DLOG(INFO) << " new_prd=" << new_prd;
+  // DLOG(INFO) << " old_cur=" << old_cur;
+  // DLOG(INFO) << " new_cur=" << new_cur;
 
   // if (new_prd != new_cur): insert transform (new_prd -> new_cur)
   Array<Expr> transformed_args;

@@ -41,14 +41,16 @@ class ROCMDeviceAPI final : public DeviceAPI {
     int value = 0;
     switch (kind) {
       case kExist: {
-        if (hsa_init() == HSA_STATUS_SUCCESS) {
-          int dev;
-          ROCM_CALL(hipGetDeviceCount(&dev));
-          value = dev > device.device_id ? 1 : 0;
-          hsa_shut_down();
-        } else {
-          value = 0;
-        }
+        // if (hsa_init() == HSA_STATUS_SUCCESS) {
+        //   int dev;
+        //   ROCM_CALL(hipGetDeviceCount(&dev));
+        //   value = dev > device.device_id ? 1 : 0;
+        //   hsa_shut_down();
+        // } else {
+        //   value = 0;
+        // }
+        value = (hipDeviceGetAttribute(&value, hipDeviceAttributeMaxThreadsPerBlock, device.device_id) ==
+          hipSuccess);
         break;
       }
       case kMaxThreadsPerBlock: {
@@ -126,16 +128,32 @@ class ROCMDeviceAPI final : public DeviceAPI {
     *rv = value;
   }
   void* AllocDataSpace(Device dev, size_t nbytes, size_t alignment, DLDataType type_hint) final {
-    ROCM_CALL(hipSetDevice(dev.device_id));
     ICHECK_EQ(256 % alignment, 0U) << "ROCM space is aligned at 256 bytes";
     void* ret;
-    ROCM_CALL(hipMalloc(&ret, nbytes));
+    if (dev.device_type == kDLROCMHost) {
+      VLOG(1) << "allocating " << nbytes << "bytes on host";
+      ROCM_CALL(hipHostMalloc(&ret, nbytes));
+    } else {
+      VLOG(0) << "hipSetDevice device_id :  " << dev.device_id << std::endl;
+      ROCM_CALL(hipSetDevice(dev.device_id));
+      size_t free_mem, total_mem;
+      ROCM_CALL(hipMemGetInfo(&free_mem, &total_mem));
+      VLOG(1) << "allocating " << nbytes << " bytes on device, with " << free_mem
+              << " bytes currently free out of " << total_mem << " bytes available";
+      ROCM_CALL(hipMalloc(&ret, nbytes));
+    }
     return ret;
   }
 
   void FreeDataSpace(Device dev, void* ptr) final {
-    ROCM_CALL(hipSetDevice(dev.device_id));
-    ROCM_CALL(hipFree(ptr));
+    if (dev.device_type == kDLROCMHost) {
+      VLOG(1) << "freeing host memory";
+      ROCM_CALL(hipHostFree(ptr));
+    } else {
+      ROCM_CALL(hipSetDevice(dev.device_id));
+      VLOG(1) << "freeing device memory";
+      ROCM_CALL(hipFree(ptr));
+    }
   }
 
   void CopyDataFromTo(const void* from, size_t from_offset, void* to, size_t to_offset, size_t size,
@@ -144,6 +162,21 @@ class ROCMDeviceAPI final : public DeviceAPI {
     hipStream_t hip_stream = static_cast<hipStream_t>(stream);
     from = static_cast<const char*>(from) + from_offset;
     to = static_cast<char*>(to) + to_offset;
+
+    if (dev_from.device_type == kDLROCMHost) {
+      dev_from.device_type = kDLCPU;
+    }
+
+    if (dev_to.device_type == kDLROCMHost) {
+      dev_to.device_type = kDLCPU;
+    }
+
+    // In case there is a copy from host mem to host mem */
+    if (dev_to.device_type == kDLCPU && dev_from.device_type == kDLCPU) {
+      memcpy(to, from, size);
+      return;
+    }
+
     if (dev_from.device_type == kDLROCM && dev_to.device_type == kDLROCM) {
       ROCM_CALL(hipSetDevice(dev_from.device_id));
       if (dev_from.device_id == dev_to.device_id) {
@@ -187,7 +220,7 @@ class ROCMDeviceAPI final : public DeviceAPI {
  private:
   static void GPUCopy(const void* from, void* to, size_t size, hipMemcpyKind kind,
                       hipStream_t stream) {
-    if (stream != 0) {
+    if (stream != nullptr) {
       ROCM_CALL(hipMemcpyAsync(to, from, size, kind, stream));
     } else {
       ROCM_CALL(hipMemcpy(to, from, size, kind));

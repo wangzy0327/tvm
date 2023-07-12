@@ -344,12 +344,37 @@ TVM_REGISTER_TARGET_KIND("rocm", kDLROCM)
     .set_default_keys({"rocm", "gpu"})
     .set_target_parser(UpdateROCmAttrs);
 
-TVM_REGISTER_TARGET_KIND("sycl", kDLSYCL)
-    .add_attr_option<Bool>("system-lib")
-    .add_attr_option<Integer>("max_num_threads", Integer(64))
-    .add_attr_option<Integer>("thread_warp_size", Integer(1))
-    .add_attr_option<Integer>("texture_spatial_limit", Integer(16384))
-    .set_default_keys({"sycl", "gpu"});    
+#ifdef USE_SYCL_CUDA
+  TVM_REGISTER_TARGET_KIND("sycl", kDLSYCL)
+      .add_attr_option<Bool>("system-lib")
+      .add_attr_option<Integer>("max_num_threads", Integer(64))
+      .add_attr_option<Integer>("thread_warp_size", Integer(32))
+      .add_attr_option<Integer>("texture_spatial_limit", Integer(16384))
+      .set_default_keys({"sycl", "gpu"});    
+#elif USE_SYCL_HIP
+  TVM_REGISTER_TARGET_KIND("sycl", kDLSYCL)
+      .add_attr_option<Bool>("system-lib")
+      .add_attr_option<Integer>("max_num_threads", Integer(1024))
+      .add_attr_option<Integer>("thread_warp_size", Integer(64))
+      .add_attr_option<Integer>("texture_spatial_limit", Integer(16384))
+      .set_default_keys({"sycl", "gpu"}); 
+#elif USE_SYCL_DPCPP
+  TVM_REGISTER_TARGET_KIND("sycl", kDLSYCL)
+      .add_attr_option<Bool>("system-lib")
+      .add_attr_option<Integer>("max_num_threads", Integer(1024))
+      .add_attr_option<Integer>("thread_warp_size", Integer(128))
+      .add_attr_option<Integer>("texture_spatial_limit", Integer(16384))
+      .set_default_keys({"sycl", "gpu"}); 
+#else
+  TVM_REGISTER_TARGET_KIND("sycl", kDLSYCL)
+      .add_attr_option<Bool>("system-lib")
+      .add_attr_option<Integer>("max_num_threads", Integer(64))
+      .add_attr_option<Integer>("thread_warp_size", Integer(1))
+      .add_attr_option<Integer>("texture_spatial_limit", Integer(16384))
+      .set_default_keys({"sycl", "gpu"}); 
+#endif      
+
+
 
 TVM_REGISTER_TARGET_KIND("opencl", kDLOpenCL)
     .add_attr_option<Integer>("max_num_threads", Integer(256))

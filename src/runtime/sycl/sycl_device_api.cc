@@ -205,7 +205,7 @@ void SYCLWorkspace::Init(const std::string& device_type, const std::string& plat
   // look for matched platform
   bool have_platform = false;
   auto platforms = sycl::platform::get_platforms();
-  std::string target_platform = SYCL_GPU_TYPE; //from config.cmake, possible values: "nvidia", "amd","intel".
+  std::string target_platform = SYCL_GPU_TYPE; //from config.cmake, possible values: "nvidia", "amd", "intel".
   std::string key;
   // LOG(INFO)<<"target_platform is "<<target_platform;
   // LOG(INFO)<<"platform_name is "<<platform_name<<std::endl;

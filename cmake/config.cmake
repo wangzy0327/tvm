@@ -68,13 +68,20 @@ set(USE_AOCL OFF)
 # - ON: enable SYCL with cmake's auto search, not support now.
 # - OFF: disable SYCL
 # - /path/to/sycl: use specific path to sycl
-set(USE_SYCL OFF)
+set(USE_SYCL "/home/wzy/sycl_workspace/build-hip-2022-12")
 # GPU type, used to set sycl compile option.
 # Possible values: "nvidia", "amd", "intel".
-set(SYCL_GPU "intel")
-set(USE_SYCL_CUDA "nvptx64-nvidia-cuda")
-set(USE_SYCL_HIP "amdgcn-amd-amdhsa -Xsycl-target-backend --offload-arch=gfx906")
-set(USE_SYCL_DPCPP "")
+set(SYCL_GPU "amd")
+if(SYCL_GPU STREQUAL "nvidia")
+    set(USE_SYCL_CUDA "nvptx64-nvidia-cuda")
+    add_definitions(-DUSE_SYCL_CUDA)
+elseif(SYCL_GPU STREQUAL "amd")    
+    set(USE_SYCL_HIP "amdgcn-amd-amdhsa -Xsycl-target-backend --offload-arch=gfx908")
+    add_definitions(-DUSE_SYCL_HIP)
+elseif(SYCL_GPU STREQUAL "intel")
+    set(USE_SYCL_DPCPP "")
+    add_definitions(-DUSE_SYCL_DPCPP)
+endif()
 
 # if enable SYCL runtime, please set storage path for sycl temporary files. The default path is "/tmp/tvm_sycl/".
 set(SYCL_TEMP_FOLDER "/tmp/tvm_sycl")
