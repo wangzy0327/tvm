@@ -269,7 +269,7 @@ TvmLogDebugSettings TvmLogDebugSettings::ParseSpec(const char* opt_spec) {
                  << ": invalid level: \"" << level << "\"";
       return settings;
     }
-    LOG(INFO) << "TVM_LOG_DEBUG enables VLOG statements in '" << name << "' up to level " << level;
+    // LOG(INFO) << "TVM_LOG_DEBUG enables VLOG statements in '" << name << "' up to level " << level;
     settings.vlog_level_map_.emplace(name, level_val);
   }
   return settings;

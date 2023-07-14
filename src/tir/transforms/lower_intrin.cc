@@ -132,7 +132,7 @@ class IntrinInjecter : public tvm::arith::IRMutatorWithAnalyzer {
         return VisitExpr_(tvm::floor(op->a / op->b).as<CallNode>());
       } else {
         // uncommon case
-        DLOG(INFO) << "LowerFloorDiv: Cannot decide the sign of divisor";
+        // DLOG(INFO) << "LowerFloorDiv: Cannot decide the sign of divisor";
         auto rmod = tir::Var("rmod", dtype);
         auto rdiv = tir::Var("rdiv", dtype);
         // b >= 0 => (rmod >=0 ? rdiv : rdiv - 1)

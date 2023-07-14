@@ -94,7 +94,7 @@ void SYCLWorkspace::GetAttr(Device dev, DeviceAttrKind kind, TVMRetValue* rv) {
     case kMaxThreadDimensions: {
       sycl::id<3> max_work_item_sizes = this->devices[index].get_info<sycl::info::device::max_work_item_sizes<3>>();
       std::stringstream ss;  // use json string to return multiple int values;
-      ss << "[" << max_work_item_sizes[0] << ", " << max_work_item_sizes[1] << ", " << max_work_item_sizes[2] << "]";
+      ss << "[" << max_work_item_sizes[2] << ", " << max_work_item_sizes[1] << ", " << max_work_item_sizes[0] << "]";
       *rv = ss.str();
       break;
     }
